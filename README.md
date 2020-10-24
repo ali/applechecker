@@ -14,8 +14,14 @@ Also let you know if inventory becomes zero again so you don't jump out of bed w
 
 ## Usage
 
+### With Mail Notification
 ```
 python check.py <model> <zipcode> <check interval in seconds> <emails or phone numbers delimited by comma> <your gmail account if you want email alerts> <your gmail password if you want email alerts>
+```
+
+### Without Mail Notification
+```
+python check.py <model> <zipcode> <check interval in seconds>
 ```
 
 ### Example:

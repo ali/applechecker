@@ -16,7 +16,10 @@ class SmtpAlert(BaseAlert):
         self.dest = dest
         self.login = login
         self.password = password
-        self.send = self._print_ahead(self.send_smtp)
+        if dest is None:
+            self.send = print
+        else:
+            self.send = self._print_ahead(self.send_smtp)
 
     def send_smtp(self, msgbody):
         message = MIMEText(msgbody, _charset="UTF-8")
