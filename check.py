@@ -27,11 +27,16 @@ INPUT_ERRORS = {"Products Invalid or not buyable",
 INITMSG = "{} Start monitoring {} inventory in area {}."
 
 
-def main(model, zipcode, sec=5, *alert_params):
+def main(models, zipcode, sec=5, *alert_params):
     good_stores = []
     my_alert = SmtpAlert(*alert_params)
-    params = {'parts.0': model,
-              'location': zipcode}
+    params = {'location': zipcode}
+    items = models.split(",")
+    i = 0
+    for it in items:
+        key_i = "parts.%d" % (i)
+        params.update({key_i: items[i]})
+        i += 1
     sec = int(sec)
     i, cnt = 0, sec
     init = True
@@ -49,11 +54,15 @@ def main(model, zipcode, sec=5, *alert_params):
                 "{}?{}".format(URL, urlencode(params)))
             json_body = json.load(response)['body']
             stores = json_body['stores'][:8]
-            item = (stores[0]['partsAvailability']
-                    [model]['storePickupProductTitle'])
+            # for each every model
+            prod_titles = ''
+            for it in stores[0]['partsAvailability']:
+                ptitle = stores[0]['partsAvailability'][it]['storePickupProductTitle']
+                prod_titles += '{}, '.format(ptitle)
+            prod_titles = prod_titles.rstrip(', ')
             if init:
                 my_alert.send(INITMSG.format(
-                    time.strftime(DATEFMT), item, zipcode))
+                    time.strftime(DATEFMT), prod_titles, zipcode))
                 init = False
         except (ValueError, KeyError, gaierror) as reqe:
             error_msg = "Failed to query Apple Store, details: {}".format(reqe)
@@ -70,20 +79,22 @@ def main(model, zipcode, sec=5, *alert_params):
 
         for store in stores:
             sname = store['storeName']
-            item = store['partsAvailability'][model]['storePickupProductTitle']
-            if store['partsAvailability'][model]['pickupDisplay'] \
-                    == "available":
-                if sname not in good_stores:
-                    good_stores.append(sname)
-                    msg = u"{} Found it! {} has {}! {}{}".format(
-                        time.strftime(DATEFMT), sname, item, BUY, model)
-                    my_alert.send(msg)
-            else:
-                if sname in good_stores:
-                    good_stores.remove(sname)
-                    msg = u"{} Oops all {} in {} are gone :( ".format(
-                        time.strftime(DATEFMT), item, sname)
-                    my_alert.send(msg)
+            # traversing every model
+            for model in stores[0]['partsAvailability']:
+                item = store['partsAvailability'][model]['storePickupProductTitle']
+                if store['partsAvailability'][model]['pickupDisplay'] \
+                        == "available":
+                    if sname not in good_stores:
+                        good_stores.append(sname)
+                        msg = u"{} Found it! {} has {}! {}{}".format(
+                            time.strftime(DATEFMT), sname, item, BUY, model)
+                        my_alert.send(msg)
+                else:
+                    if sname in good_stores:
+                        good_stores.remove(sname)
+                        msg = u"{} Oops all {} in {} are gone :( ".format(
+                            time.strftime(DATEFMT), item, sname)
+                        my_alert.send(msg)
 
         if good_stores:
             print(u"{current} Still Avaiable: {stores}".format(

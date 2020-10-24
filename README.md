@@ -2,7 +2,7 @@
 
 > Check Apple Store Inventory
 
-Keep checking Apple Store inventory and send you alert when nearby stores have your desired device in stock.
+Keep checking Apple Store inventory and send you alert when nearby stores have your desired devices in stock.
 Also let you know if inventory becomes zero again so you don't jump out of bed when it is already too late.
 
 * [Prerequisites](#prerequisites)
@@ -16,12 +16,12 @@ Also let you know if inventory becomes zero again so you don't jump out of bed w
 
 ### With Mail Notification
 ```
-python check.py <model> <zipcode> <check interval in seconds> <emails or phone numbers delimited by comma> <your gmail account if you want email alerts> <your gmail password if you want email alerts>
+python check.py <models> <zipcode> <check interval in seconds> <emails or phone numbers delimited by comma> <your gmail account if you want email alerts> <your gmail password if you want email alerts>
 ```
 
 ### Without Mail Notification
 ```
-python check.py <model> <zipcode> <check interval in seconds>
+python check.py <models> <zipcode> <check interval in seconds>
 ```
 
 ### Example:
@@ -47,6 +47,18 @@ Model number is a unique identifier, U.S. models end with "LL/*". (https://www.t
     or just check your model number here: http://www.everyi.com/
 
 To verify, visit `http://store.apple.com/xc/product/<model numer>` and see if it shows the product you want.
+
+#### Check Multiple Models at Once
+
+> 小孩子才做選擇, 我們成年人全都要! Only the child chooses. We, adult want it all.
+
+If you would like to check multiple model at once, you may specify the **Model Identifier** at the `<models>` field and delimit them by comma.
+
+* For both Apple Watch and iPhone:
+
+```
+python /path/to/check.py "MNPR2LL/A,MN5L2LL/A" "12345" 5
+```
 
 ### Docker Example:
 
