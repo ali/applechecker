@@ -2,6 +2,8 @@ import smtplib
 from email.mime.text import MIMEText
 from socket import gaierror
 
+def noop(msg):
+    pass
 
 class BaseAlert(object):
     def _print_ahead(self, method):
@@ -17,7 +19,7 @@ class SmtpAlert(BaseAlert):
         self.login = login
         self.password = password
         if dest is None:
-            self.send = print
+            self.send = self._print_ahead(noop)
         else:
             self.send = self._print_ahead(self.send_smtp)
 
